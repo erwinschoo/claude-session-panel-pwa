@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Session, Status } from './types';
 import { STATUS } from './status';
-import { apiUrl, useSessions } from './useSessions';
+import { useSessions } from './useSessions';
+import { apiUrl, probe, getToken, getBase, hasExplicitBase, clearConnection } from './connection';
 import { Header } from './components/Header';
 import { FilterBar } from './components/FilterBar';
 import { SessionCard } from './components/SessionCard';
 import { SessionDrawer } from './components/SessionDrawer';
 import { SettingsDrawer, type SettingKey, type Settings } from './components/SettingsDrawer';
+import { ConnectScreen } from './components/ConnectScreen';
 import { Toasts, type ToastItem } from './components/Toasts';
 import { DisconnectedBanner, EmptyState, SkeletonGrid } from './components/States';
 
@@ -30,7 +32,8 @@ const EMPTY_COUNTS: Record<Status, number> = {
 };
 
 export default function App() {
-  const { sessions, connected, everConnected, reconnectNow } = useSessions();
+  const [phase, setPhase] = useState<'checking' | 'connect' | 'ready'>('checking');
+  const { sessions, connected, everConnected, reconnectNow } = useSessions(phase === 'ready');
   const [now, setNow] = useState(() => Date.now());
   const [filter, setFilter] = useState<Status | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -50,6 +53,28 @@ export default function App() {
     const t = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(t);
   }, []);
+
+  // bepaal bij opstart of we al een (werkende) host hebben, anders verbind-scherm
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (hasExplicitBase()) {
+        if (!cancelled) setPhase('ready');
+        return;
+      }
+      const res = await probe('', getToken()); // same-origin (host serveert de PWA zelf?)
+      if (!cancelled) setPhase(res === 'ok' ? 'ready' : 'connect');
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function changeHost() {
+    clearConnection();
+    setSettingsOpen(false);
+    setPhase('connect');
+  }
 
   useEffect(() => {
     localStorage.setItem('panel_settings', JSON.stringify(settings));
@@ -173,6 +198,24 @@ export default function App() {
   const showLoading = !everConnected;
   const showEmpty = everConnected && sessions.length === 0;
 
+  if (phase === 'checking') {
+    return (
+      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6B6C70', fontSize: 14 }}>
+        verbinden…
+      </div>
+    );
+  }
+  if (phase === 'connect') {
+    return (
+      <ConnectScreen
+        onConnected={() => {
+          setPhase('ready');
+          reconnectNow();
+        }}
+      />
+    );
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', color: '#ECECEC', background: '#0F1012' }}>
       <Header
@@ -241,7 +284,13 @@ export default function App() {
       )}
 
       {settingsOpen && (
-        <SettingsDrawer settings={settings} onToggle={toggleSetting} onClose={() => setSettingsOpen(false)} />
+        <SettingsDrawer
+          settings={settings}
+          onToggle={toggleSetting}
+          onClose={() => setSettingsOpen(false)}
+          host={getBase() || 'dit device (lokaal)'}
+          onChangeHost={changeHost}
+        />
       )}
 
       <Toasts toasts={toasts} onClose={(id) => setToasts((cur) => cur.filter((t) => t.id !== id))} />

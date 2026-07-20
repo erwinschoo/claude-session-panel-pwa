@@ -31,7 +31,7 @@ export function Header({
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-          <img src="/icons/dee.svg" alt="" height={24} width={24} />
+          <img src={`${import.meta.env.BASE_URL}icons/dee.svg`} alt="" height={24} width={24} />
           {attentionCount > 0 && (
             <span
               style={{

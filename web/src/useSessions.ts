@@ -1,24 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Session } from './types';
-
-function token(): string {
-  try {
-    return localStorage.getItem('panel_token') || '';
-  } catch {
-    return '';
-  }
-}
-
-export function wsUrl(): string {
-  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const t = token();
-  return `${proto}//${location.host}/ws${t ? `?token=${encodeURIComponent(t)}` : ''}`;
-}
-
-export function apiUrl(path: string): string {
-  const t = token();
-  return `${path}${t ? `${path.includes('?') ? '&' : '?'}token=${encodeURIComponent(t)}` : ''}`;
-}
+import { wsUrl } from './connection';
 
 export interface UseSessions {
   sessions: Session[];
@@ -27,7 +9,7 @@ export interface UseSessions {
   reconnectNow: () => void;
 }
 
-export function useSessions(): UseSessions {
+export function useSessions(enabled: boolean): UseSessions {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [connected, setConnected] = useState(false);
   const [everConnected, setEverConnected] = useState(false);
@@ -82,6 +64,7 @@ export function useSessions(): UseSessions {
   }, [connect]);
 
   useEffect(() => {
+    if (!enabled) return;
     closedRef.current = false;
     connect();
     return () => {
@@ -89,7 +72,7 @@ export function useSessions(): UseSessions {
       if (timerRef.current) window.clearTimeout(timerRef.current);
       wsRef.current?.close();
     };
-  }, [connect]);
+  }, [connect, enabled]);
 
   return { sessions, connected, everConnected, reconnectNow };
 }

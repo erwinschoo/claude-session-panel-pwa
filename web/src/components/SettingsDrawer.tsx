@@ -22,10 +22,14 @@ export function SettingsDrawer({
   settings,
   onToggle,
   onClose,
+  host,
+  onChangeHost,
 }: {
   settings: Settings;
   onToggle: (k: SettingKey) => void;
   onClose: () => void;
+  host: string;
+  onChangeHost: () => void;
 }) {
   return (
     <div
@@ -136,6 +140,50 @@ export function SettingsDrawer({
             </div>
           );
         })}
+
+        <div style={{ fontSize: 10.5, textTransform: 'uppercase', letterSpacing: '.08em', color: '#5f6065', fontWeight: 600, marginTop: 10 }}>
+          verbinding
+        </div>
+        <div
+          style={{
+            padding: '13px 15px',
+            borderRadius: 11,
+            border: '1px solid rgba(255,255,255,0.06)',
+            background: '#17181b',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}
+        >
+          <div style={{ fontSize: 11.5, color: '#6B6C70' }}>huidige host</div>
+          <div
+            style={{
+              fontSize: 12.5,
+              color: '#d6d7db',
+              fontFamily: 'ui-monospace,Menlo,monospace',
+              wordBreak: 'break-all',
+            }}
+          >
+            {host}
+          </div>
+          <button
+            onClick={onChangeHost}
+            className="ghost-btn"
+            style={{
+              marginTop: 4,
+              height: 38,
+              background: 'transparent',
+              color: '#d6d7db',
+              border: '1px solid rgba(255,255,255,0.14)',
+              borderRadius: 8,
+              fontSize: 12.5,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            host wijzigen / ontkoppelen
+          </button>
+        </div>
 
         <div style={{ flex: 1 }} />
         <div style={{ textAlign: 'center', fontSize: 11.5, color: '#3d3e42', fontWeight: 600 }}>

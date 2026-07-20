@@ -5,7 +5,11 @@ import { VitePWA } from 'vite-plugin-pwa';
 // Backend-poort (companion). Moet matchen met server/.env PORT.
 const API = 'http://127.0.0.1:4317';
 
+// base = '/' voor de host-geserveerde build; GitHub Pages zet VITE_BASE=/claude-session-panel-pwa/
+const base = process.env.VITE_BASE || '/';
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
