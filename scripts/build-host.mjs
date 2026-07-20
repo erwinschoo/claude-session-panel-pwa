@@ -7,15 +7,19 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
-const run = (cmd, args, env) =>
-  execFileSync(cmd, args, { cwd: root, stdio: 'inherit', env: { ...process.env, ...env } });
+
+// npm is een .cmd op Windows → shell:true (anders EINVAL sinds Node 20.12).
+// Args bevatten zelf geen spaties; cwd wordt niet door de shell geparsed.
+const npm = (args, env) =>
+  execFileSync('npm', args, { cwd: root, stdio: 'inherit', shell: true, env: { ...process.env, ...env } });
+// node-script: zonder shell zodat paden met spaties intact blijven.
+const node = (scriptPath) => execFileSync(process.execPath, [scriptPath], { cwd: root, stdio: 'inherit' });
 
 console.log('· web-build (base /) …');
-run(npm, ['run', 'build', '--workspace', 'web'], { VITE_BASE: '/' });
+npm(['run', 'build', '--workspace', 'web'], { VITE_BASE: '/' });
 
 console.log('· assets embedden …');
-run(process.execPath, [path.join(root, 'scripts', 'embed-assets.mjs')]);
+node(path.join(root, 'scripts', 'embed-assets.mjs'));
 
 console.log('· esbuild server-bundle …');
 const outCjs = path.join(root, 'build', 'host.cjs');
@@ -27,8 +31,7 @@ await build({
   format: 'cjs',
   target: 'node20',
   outfile: outCjs,
-  // fsevents is een optionele macOS-native dep van chokidar — niet nodig op Windows.
-  external: ['fsevents'],
+  external: ['fsevents'], // optionele macOS-native dep van chokidar
   logLevel: 'info',
 });
 
@@ -36,6 +39,8 @@ console.log('· pkg → .exe …');
 const exeDir = path.join(root, 'dist-exe');
 fs.mkdirSync(exeDir, { recursive: true });
 const exe = path.join(exeDir, 'session-panel-host.exe');
-run(npm, ['exec', '--', '@yao-pkg/pkg', outCjs, '--targets', 'node20-win-x64', '--output', exe]);
+// Programmatische pkg-API: geen .cmd-spawn, args als array (paden met spaties veilig).
+const pkg = await import('@yao-pkg/pkg');
+await pkg.exec([outCjs, '--targets', 'node20-win-x64', '--output', exe]);
 
 console.log(`\n✓ klaar: ${exe}`);
