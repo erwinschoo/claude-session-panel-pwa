@@ -1,0 +1,7 @@
+/* delaware design system — global entry point.
+ * Consumers link this single file. Imports only. */
+
+@import url("tokens/fonts.css");
+@import url("tokens/colors.css");
+@import url("tokens/typography.css");
+@import url("tokens/spacing.css");

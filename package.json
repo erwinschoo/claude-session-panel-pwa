@@ -1,0 +1,20 @@
+{
+  "name": "claude-session-panel",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Air-traffic-control dashboard voor lopende Claude Code sessies over meerdere VS Code windows.",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:server dev:web",
+    "dev:server": "npm --workspace server run dev",
+    "dev:web": "npm --workspace web run dev",
+    "build": "npm --workspace web run build",
+    "start": "npm --workspace server run start"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}

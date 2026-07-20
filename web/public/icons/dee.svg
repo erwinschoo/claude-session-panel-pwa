@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="session panel">
+  <rect width="512" height="512" rx="112" fill="#141518"/>
+  <rect x="8" y="8" width="496" height="496" rx="104" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
+  <!-- centrale 'dot' (het signatuur-element) -->
+  <circle cx="256" cy="256" r="86" fill="#F0603A"/>
+  <!-- drie sessie-statusstippen in een boog -->
+  <circle cx="150" cy="150" r="30" fill="#F59E0B"/>
+  <circle cx="362" cy="150" r="30" fill="#3B82F6"/>
+  <circle cx="362" cy="362" r="30" fill="#22C55E"/>
+  <circle cx="150" cy="362" r="30" fill="#72C4BF"/>
+</svg>

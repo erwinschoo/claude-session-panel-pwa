@@ -1,0 +1,61 @@
+/* delaware — color tokens
+ * Source: delaware brand guidelines. Red-dominant warm palette.
+ * Never use blue, navy, or green as primary accents. */
+
+:root {
+  /* ---- Primary reds ---- */
+  --dlw-primary-red: #C42828; /* dominant brand accent, headers, dividers */
+  --dlw-dot-red: #EF463C;     /* the logo dot; links, hover, highlights */
+  --dlw-sub-red-1: #EE7684;   /* light accent, pattern, chart secondary */
+  --dlw-sub-red-2: #941914;   /* deep contrast, overlays, emphasis */
+
+  /* ---- Secondary ---- */
+  --dlw-teal: #72C4BF;   /* key complementary — callouts, stats, icons */
+  --dlw-purple: #AD9BCB; /* supporting accent, data-viz variety */
+
+  /* ---- Neutrals ---- */
+  --dlw-text-gray: #3C3C3C;  /* body text, dark headings, logotype */
+  --dlw-mid-gray: #999999;   /* captions, muted labels, axis lines */
+  --dlw-light-gray: #F5F5F5; /* subtle surfaces, table rows, borders */
+  --dlw-white: #FFFFFF;
+
+  /* ---- 20% tint variants (lighter background washes) ---- */
+  --dlw-primary-red-20: rgba(196, 40, 40, 0.20);
+  --dlw-dot-red-20: rgba(239, 70, 60, 0.20);
+  --dlw-teal-20: rgba(114, 196, 191, 0.20);
+  --dlw-purple-20: rgba(173, 155, 203, 0.20);
+
+  /* ---- Semantic aliases ---- */
+  --color-bg: var(--dlw-white);
+  --color-bg-subtle: var(--dlw-light-gray);
+  --color-bg-brand: var(--dlw-primary-red);
+  --surface-card: var(--dlw-white);
+  --surface-card-subtle: var(--dlw-light-gray);
+  --border-subtle: #E6E6E6;
+  --border-default: var(--dlw-mid-gray);
+
+  --text-body: var(--dlw-text-gray);
+  --text-heading: var(--dlw-text-gray);
+  --text-muted: var(--dlw-mid-gray);
+  --text-on-brand: var(--dlw-white);
+  --text-link: var(--dlw-dot-red);
+  --text-link-hover: var(--dlw-primary-red);
+
+  --accent: var(--dlw-primary-red);
+  --accent-hover: var(--dlw-dot-red);
+  --accent-info: var(--dlw-teal);
+
+  /* ---- Brand gradients (135°) ---- */
+  --dlw-gradient-warm: linear-gradient(135deg, #EF463C, #EE7684); /* @kind color */
+  --dlw-gradient-contrast: linear-gradient(135deg, #941914, #EF463C); /* @kind color */
+  --dlw-gradient-fresh: linear-gradient(135deg, #EF463C, #72C4BF); /* @kind color */
+  --dlw-gradient-soft: linear-gradient(135deg, #C9A8E0, #AD9BCB); /* @kind color */
+
+  /* ---- Data-viz cycle (ordered) ---- */
+  --dlw-chart-1: var(--dlw-primary-red);
+  --dlw-chart-2: var(--dlw-dot-red);
+  --dlw-chart-3: var(--dlw-teal);
+  --dlw-chart-4: var(--dlw-purple);
+  --dlw-chart-5: var(--dlw-mid-gray);
+  --dlw-chart-6: var(--dlw-sub-red-1);
+}

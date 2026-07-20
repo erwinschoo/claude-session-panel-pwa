@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.log
+.env
+.DS_Store
+web/dev-dist/
+
+# Design-export uit Claude Design (bevat delaware brand-materiaal) — niet publiek committen
+DESIGN/
+
+# Claude Code lokale sessie-config
+.claude/
