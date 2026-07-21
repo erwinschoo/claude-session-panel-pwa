@@ -23,7 +23,14 @@ function saveRuntime(data: Record<string, string>): void {
   }
 }
 
-const host = process.env.HOST ?? '127.0.0.1';
+// Draaien we als gepackte .exe (pkg)? Dan is dit "de app": bind op alle interfaces zodat
+// telefoon/andere PC erbij kunnen, en open standaard het app-venster. Robuuste detectie:
+// pkg zet `process.pkg`; anders is de executable niet 'node' (maar session-panel-host.exe).
+const execName = path.basename(process.execPath).toLowerCase();
+export const packaged = !!(process as any).pkg || (execName !== 'node.exe' && execName !== 'node');
+
+// De .exe bindt standaard op 0.0.0.0 (LAN-bereikbaar); vanuit broncode op localhost.
+const host = process.env.HOST ?? (packaged ? '0.0.0.0' : '127.0.0.1');
 export const isLocalOnly = host === '127.0.0.1' || host === 'localhost' || host === '::1';
 
 // Token: expliciet uit .env, anders persistent auto-gegenereerd (nodig zodra niet-localhost).
@@ -47,9 +54,6 @@ function resolveOrigins(): string[] {
     .filter(Boolean);
   return [...new Set([...defaultOrigins, ...extra])];
 }
-
-// Draaien we als gepackte .exe (pkg)? Dan is dit "de app" → open standaard het app-venster.
-const packaged = !!(process as any).pkg;
 
 export const config = {
   port: Number(process.env.PORT ?? 4317),

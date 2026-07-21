@@ -47,6 +47,9 @@ Op je laptop hoef je verder niets — geen Tailscale, geen adres invoeren.
 **Zelfde WiFi:** scan de QR uit de host-console → je telefoon opent de LAN-URL → het dashboard
 verschijnt (same-origin, automatisch verbonden). *Toevoegen aan startscherm* geeft een icoon.
 
+> Eerste keer: Windows vraagt of *session-panel-host* door de **firewall** mag — kies
+> **Toestaan** voor *privé netwerken*, anders kan je telefoon de host niet bereiken.
+
 **Buiten WiFi (mobiele data / ander netwerk):** dat gaat via **Tailscale** (gratis, privé):
 
 1. Installeer Tailscale op je laptop én telefoon (zelfde account).

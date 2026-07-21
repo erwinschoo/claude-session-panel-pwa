@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import qrcodeTerminal from 'qrcode-terminal';
 import { detectTailscale, serveTailscale } from './tailscale.js';
+import { isLocalOnly } from './config.js';
 
 // Voorkeur: echte thuis-LAN (192.168.*) boven 10.*/172.*; sluit APIPA link-local (169.254.*)
 // en Tailscale-CGNAT (100.64–100.127) uit — die horen niet in de LAN-lijst.
@@ -94,6 +95,12 @@ export function printHostInfo(port: number, token: string, tailscaleServe: boole
   }
   if (token) console.log(` token       : ${token}`);
   console.log('────────────────────────────────────────────');
+
+  if (!isLocalOnly) {
+    console.log(' ⚠ verbindt je telefoon/andere PC niet? sta "session-panel-host" toe in');
+    console.log('   Windows Firewall (privé netwerk) — Windows vraagt dit meestal bij de start.');
+    console.log('────────────────────────────────────────────');
+  }
 
   if (bestLan) {
     console.log(' scan op je telefoon (zelfde WiFi):');
