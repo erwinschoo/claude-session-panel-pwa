@@ -4,32 +4,13 @@ import { Icon } from './Icon';
 
 const ACCENT = '#F0603A';
 
-type Mode = 'choose' | 'remote';
-
 export function ConnectScreen({ onConnected }: { onConnected: () => void }) {
-  const [mode, setMode] = useState<Mode>('choose');
   const [base, setBase] = useState(getBase());
   const [token, setToken] = useState(getToken());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function tryHostHere() {
-    setBusy(true);
-    setError(null);
-    const res = await probe('', token);
-    setBusy(false);
-    if (res === 'ok') {
-      setConnection('', token);
-      onConnected();
-    } else if (res === 'unauthorized') {
-      setError('deze host vraagt een token.');
-      setMode('remote');
-    } else {
-      setError('geen companion op dit device gevonden. draait de host-app hier?');
-    }
-  }
-
-  async function connectRemote(e: React.FormEvent) {
+  async function connect(e: React.FormEvent) {
     e.preventDefault();
     if (!base.trim()) {
       setError('vul het host-adres in.');
@@ -45,7 +26,7 @@ export function ConnectScreen({ onConnected }: { onConnected: () => void }) {
     } else if (res === 'unauthorized') {
       setError('token ontbreekt of is onjuist.');
     } else {
-      setError('host onbereikbaar — staat de host-app aan, en (buiten huis) Tailscale op beide apparaten?');
+      setError('host onbereikbaar. tip: gebruik https via Tailscale (een https-pagina mag geen http-host bereiken), en check of de host-app draait.');
     }
   }
 
@@ -60,73 +41,39 @@ export function ConnectScreen({ onConnected }: { onConnected: () => void }) {
           </div>
         </div>
 
-        {mode === 'choose' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <ChoiceButton
-              icon="terminal"
-              title="host op dit device"
-              sub="de companion draait op deze machine"
-              onClick={tryHostHere}
-              disabled={busy}
-            />
-            <ChoiceButton
-              icon="wifi"
-              title="verbind met een host"
-              sub="andere PC / laptop via LAN-adres of Tailscale"
-              onClick={() => {
-                setError(null);
-                setMode('remote');
-              }}
-              disabled={busy}
-            />
-            <div style={{ fontSize: 12, color: '#6B6C70', lineHeight: 1.5, marginTop: 4 }}>
-              tip: scan de QR-code uit de host-console met je telefoon — die vult adres + token
-              automatisch in.
-            </div>
-          </div>
-        )}
+        <div style={{ fontSize: 13, color: '#8a8b90', lineHeight: 1.55 }}>
+          Start de <b style={{ color: '#c2c3c7' }}>host-app</b> op je laptop en <b style={{ color: '#c2c3c7' }}>scan
+          de QR</b> uit de console — dan wordt alles hieronder automatisch ingevuld. Of vul het handmatig in:
+        </div>
 
-        {mode === 'remote' && (
-          <form onSubmit={connectRemote} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <Field label="host-adres">
-              <input
-                value={base}
-                onChange={(e) => setBase(e.target.value)}
-                placeholder="http://192.168.1.20:4317  of  https://laptop.tailnet.ts.net"
-                style={inputStyle}
-                autoFocus
-              />
-            </Field>
-            <Field label="token (indien nodig)">
-              <input
-                value={token}
-                onChange={(e) => setToken(e.target.value)}
-                placeholder="uit de host-console"
-                style={inputStyle}
-              />
-            </Field>
-            <button type="submit" className="primary-btn" disabled={busy} style={primaryStyle}>
-              {busy ? 'verbinden…' : 'verbind'}
-            </button>
-            <button
-              type="button"
-              className="ghost-btn"
-              onClick={() => {
-                setError(null);
-                setMode('choose');
-              }}
-              style={ghostStyle}
-            >
-              terug
-            </button>
-          </form>
-        )}
+        <form onSubmit={connect} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <Field label="host-adres">
+            <input
+              value={base}
+              onChange={(e) => setBase(e.target.value)}
+              placeholder="http://192.168.1.20:4317  of  https://laptop.tailnet.ts.net"
+              style={inputStyle}
+              autoFocus
+            />
+          </Field>
+          <Field label="token (indien nodig)">
+            <input
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="uit de host-console"
+              style={inputStyle}
+            />
+          </Field>
+          <button type="submit" disabled={busy} style={primaryStyle}>
+            {busy ? 'verbinden…' : 'verbind'}
+          </button>
+        </form>
 
         {error && (
           <div
             style={{
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'flex-start',
               gap: 8,
               padding: '11px 13px',
               background: 'rgba(220,38,38,0.12)',
@@ -134,68 +81,17 @@ export function ConnectScreen({ onConnected }: { onConnected: () => void }) {
               borderRadius: 10,
               fontSize: 13,
               color: '#F0A9A9',
+              lineHeight: 1.5,
             }}
           >
-            <Icon name="alert" size={16} color="#DC2626" />
+            <span style={{ flexShrink: 0, marginTop: 1 }}>
+              <Icon name="alert" size={16} color="#DC2626" />
+            </span>
             {error}
           </div>
         )}
       </div>
     </div>
-  );
-}
-
-function ChoiceButton({
-  icon,
-  title,
-  sub,
-  onClick,
-  disabled,
-}: {
-  icon: 'terminal' | 'wifi';
-  title: string;
-  sub: string;
-  onClick: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      className="card"
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        textAlign: 'left',
-        padding: '15px 16px',
-        background: '#1A1B1E',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 12,
-        cursor: 'pointer',
-        color: '#ECECEC',
-      }}
-    >
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 38,
-          height: 38,
-          borderRadius: 10,
-          background: 'rgba(240,96,58,0.14)',
-          color: ACCENT,
-          flexShrink: 0,
-        }}
-      >
-        <Icon name={icon} size={18} color={ACCENT} />
-      </span>
-      <div>
-        <div style={{ fontSize: 14, fontWeight: 600 }}>{title}</div>
-        <div style={{ fontSize: 12, color: '#6B6C70' }}>{sub}</div>
-      </div>
-    </button>
   );
 }
 
@@ -229,16 +125,5 @@ const primaryStyle: React.CSSProperties = {
   borderRadius: 9,
   fontSize: 14,
   fontWeight: 700,
-  cursor: 'pointer',
-};
-
-const ghostStyle: React.CSSProperties = {
-  height: 40,
-  background: 'transparent',
-  color: '#d6d7db',
-  border: '1px solid rgba(255,255,255,0.14)',
-  borderRadius: 8,
-  fontSize: 13,
-  fontWeight: 600,
   cursor: 'pointer',
 };

@@ -9,7 +9,7 @@ import { config, isOriginAllowed } from './config.js';
 import { Registry } from './registry.js';
 import { startWatchers } from './watchers.js';
 import { openVSCode } from './actions.js';
-import { printHostInfo, openBrowser } from './host.js';
+import { printHostInfo, openApp } from './host.js';
 import { ASSETS } from './generated-assets.js';
 import type { Status } from './types.js';
 
@@ -169,11 +169,11 @@ async function main() {
     process.exit(1);
   }
 
-  const { primaryUrl } = printHostInfo(config.port, config.authToken);
+  const { appUrl } = printHostInfo(config.port, config.authToken, config.tailscaleServe);
   if (!hasEmbedded && !(webDist && fs.existsSync(webDist))) {
     console.log('PWA nog niet gebouwd (web/dist ontbreekt). In dev draait de Vite-server apart.');
   }
-  if (config.openBrowser) openBrowser(primaryUrl);
+  if (config.openApp) openApp(appUrl);
 }
 
 main();

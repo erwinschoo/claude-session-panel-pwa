@@ -48,13 +48,19 @@ function resolveOrigins(): string[] {
   return [...new Set([...defaultOrigins, ...extra])];
 }
 
+// Draaien we als gepackte .exe (pkg)? Dan is dit "de app" → open standaard het app-venster.
+const packaged = !!(process as any).pkg;
+
 export const config = {
   port: Number(process.env.PORT ?? 4317),
   host,
   authToken: resolveToken(),
   codeBin: process.env.CODE_BIN?.trim() || 'code',
   allowedOrigins: resolveOrigins(),
-  openBrowser: process.env.OPEN_BROWSER === '1',
+  // Open het dashboard automatisch (app-venster). Default aan in de .exe; env kan forceren.
+  openApp: process.env.OPEN_APP ? process.env.OPEN_APP === '1' : packaged,
+  // Zet `tailscale serve` automatisch op zodra Tailscale gedetecteerd is (tenzij uitgezet).
+  tailscaleServe: process.env.NO_TAILSCALE !== '1',
 };
 
 /** Mag deze Origin cross-origin verbinden? (loopback-origins altijd toegestaan.) */
